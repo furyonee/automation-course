@@ -1,9 +1,7 @@
 package base;
 
 import com.microsoft.playwright.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -11,36 +9,52 @@ import java.util.Collections;
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
 public class BaseTest {
-    Playwright playwright;
-    Browser browser;
+    static Playwright playwright;
+    static Browser browser;
     BrowserContext context;
     public Page page;
 
-    @BeforeEach
-    void setUp() {
+    @BeforeAll
+    static void setupAll() {
         playwright = Playwright.create();
-        browser = playwright.chromium().launch();
+        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
+    }
+
+    @BeforeEach
+    void setup() {
         context = browser.newContext();
         page = context.newPage();
     }
 
     @Test
-    void testMockedStatusCode() {
-        page.navigate("https://the-internet.herokuapp.com/status_codes");
-        page.route("**/status_codes/404", route -> {
-            route.fulfill(new Route.FulfillOptions()
-                    .setStatus(200)
-                    .setHeaders(Collections.singletonMap("Content-Type", "text/html"))
-                    .setBody("<h3>Mocked Success Response</h3>")
-            );
+    void simpleInterceptionTest() {
+        page.route("**/authenticate", route -> {
+            System.out.println("Запрос перехвачен!");
+            String postData = route.request().postData();
+            System.out.println("Было: " + postData);
+            String modifiedBody = postData.replace("tomsmith", "HACKED_USER");
+            System.out.println("Стало: " + modifiedBody);
+            route.resume(new Route.ResumeOptions().setPostData(modifiedBody));
         });
-        page.locator("[href=\"status_codes/404\"]").click();
-        assertThat(page.getByText("Mocked Success Response")).isVisible();
+
+        page.navigate("https://the-internet.herokuapp.com/login");
+
+        page.fill("#username", "tomsmith");
+        page.fill("#password", "SuperSecretPassword!");
+        page.click("button[type='submit']");
+
+        assertThat(page.getByText("Your username is invalid!")).isVisible();
+    }
+
+    @AfterAll
+    static void tearDownAll() {
+        browser.close();
+        playwright.close();
     }
 
     @AfterEach
     void tearDown() {
-        browser.close();
-        playwright.close();
+        context.close();
     }
+
 }
