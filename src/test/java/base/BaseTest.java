@@ -35,7 +35,6 @@ public class BaseTest {
             );
         });
         page.locator("[href=\"status_codes/404\"]").click();
-
         assertThat(page.getByText("Mocked Success Response")).isVisible();
     }
 
