@@ -1,8 +1,11 @@
 package carttest;
 
 import com.microsoft.playwright.*;
+import io.qameta.allure.Allure;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
+import java.io.ByteArrayInputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -14,6 +17,7 @@ public class CartTest {
     static Browser browser;
     BrowserContext context;
     public Page page;
+    private boolean testFailed = false;
 
     @BeforeAll
     static void setupAll() {
@@ -35,14 +39,21 @@ public class CartTest {
 
     @Test
     void testCartActions() {
-        page.navigate("https://the-internet.herokuapp.com/add_remove_elements/");
-        page.click("button:text('Add Element')");
-        page.locator("#elements").screenshot(new Locator.ScreenshotOptions()
-                .setPath(getTimestampPath("cart_after_add.png")));
-        page.click("button:text('Delete')");
+        try {
+            page.navigate("https://the-internet.herokuapp.com/add_remove_elements/");
 
-        page.screenshot(new Page.ScreenshotOptions().setPath(getTimestampPath("cart_after_action.png"))
-        );
+            page.click("text=Add Element");
+            page.screenshot(new Page.ScreenshotOptions()
+                    .setPath(getTimestampPath("cart_after_add.png")));
+
+            page.click("text=Delete");
+            page.screenshot(new Page.ScreenshotOptions()
+                    .setPath(getTimestampPath("cart_after_remove.png")));
+
+        } catch (Exception e) {
+            testFailed = true;
+            throw e;
+        }
     }
 
     private Path getTimestampPath(String filename) {
@@ -53,7 +64,18 @@ public class CartTest {
     }
 
     @AfterEach
-    void teardown() {
+    void attachScreenshotOnFailure() {
+        if (testFailed) {
+            byte[] screenshot = page.screenshot();
+
+            Allure.addAttachment(
+                    "Screenshot on Failure",
+                    "image/png",
+                    new ByteArrayInputStream(screenshot),
+                    ".png"
+            );
+        }
+
         context.close();
     }
 }
