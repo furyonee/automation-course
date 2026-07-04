@@ -16,7 +16,6 @@ public class DynamicLoadingTraceTest {
 
     @Test
     void testDynamicLoadingWithTrace() {
-
         playwright = Playwright.create();
         browser = playwright.chromium().launch();
         context = browser.newContext();
