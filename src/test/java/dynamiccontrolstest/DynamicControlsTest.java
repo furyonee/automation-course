@@ -6,6 +6,7 @@ import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+// ПЗ 18
 public class DynamicControlsTest {
     Playwright playwright;
     Browser browser;
