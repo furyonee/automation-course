@@ -24,7 +24,7 @@ public class MobileDynamicControlsTest {
                 .setHasTouch(true);
 
         browser = playwright.chromium().launch(
-                new BrowserType.LaunchOptions().setHeadless(false)
+                new BrowserType.LaunchOptions().setHeadless(true)
         );
 
         context = browser.newContext(deviceOptions);
