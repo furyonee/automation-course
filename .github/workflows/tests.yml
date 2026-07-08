@@ -48,6 +48,8 @@ jobs:
 
       # Шаг 8: Запуск конкретного тестового класса ExampleTest
       - name: Run tests
+        env:
+          env: dev
         run: mvn test -Dtest=StatusCodeTest
 
       # Шаг 9: Загрузка результатов тестов как артефакт
