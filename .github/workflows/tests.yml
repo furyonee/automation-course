@@ -50,7 +50,7 @@ jobs:
       - name: Run tests
         env:
           env: dev
-        run: mvn test -Dtest=StatusCodeTest
+        run: mvn test -Dtest=StatusCodeApiUiTest
 
       # Шаг 9: Загрузка результатов тестов как артефакт
       # Выполняется всегда (даже если тесты упали) для отладки
