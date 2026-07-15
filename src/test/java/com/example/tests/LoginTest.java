@@ -8,6 +8,18 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Проверяет авторизацию пользователя на сайте
+ * https://the-internet.herokuapp.com/login.
+ *
+ * <p>Тест использует параметризацию JUnit 5 для проверки
+ * успешного и неуспешного входа в систему.</p>
+ *
+ * <p>Для выполнения авторизации используется вспомогательный
+ * класс {@link com.example.helper.AuthHelper}.</p>
+ *
+ * @author fury
+ */
 public class LoginTest {
     static Playwright playwright;
     static Browser browser;
